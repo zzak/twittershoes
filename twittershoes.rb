@@ -44,8 +44,9 @@ require 'crypto_tool'
 
 LIMIT = 140
 
-YOUR_PASSWORD = ''
-YOUR_USERNAME = ''
+TWITTER_PASSWORD = ''
+TWITTER_USERNAME = ''
+CRYPTO_PASSWORD = ''
 
 class State < Struct.new( :ok, :message )
 end
@@ -245,11 +246,11 @@ class Tshoe < Shoes
   def index
     @data = nil
     @t = Twitter.new
-    @state = @t.credentials( false, 'qqqq' ) # TODO should store password, should also check if credentials work
+    @state = @t.credentials( false, CRYPTO_PASSWORD ) # TODO should store password, should also check if credentials work
     # check if the credentials were loaded properly, if not try a new login password
     if @state.is_a? State and not @state.ok
       debug( "State: #{@state.inspect}" )
-      @state = @t.credentials( true, YOUR_PASSWORD, YOUR_USERNAME )
+      @state = @t.credentials( true, TWITTER_PASSWORD, TWITTER_USERNAME )
     end
     debug( "State: #{@state.inspect}" )
     @page = 1
