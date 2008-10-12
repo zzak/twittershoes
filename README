@@ -1,6 +1,6 @@
-= TwitterShoes 
+= TwitterShoes
 
-* http://github.com/pedromg/twittershoes
+* http://github.com/hone/twittershoes
 
 == DESCRIPTION:
 
@@ -9,6 +9,10 @@ that uses Shoes.rb (http://code.whytheluckystiff.net/shoes) to be run
 on various platforms (Linux, MacOSX, Windows). Shoes.rb is a winner !!
 
 Please feel free to give a hand and produce some code, review it, fix bugs, etc.
+--
+In this fork, I've started some work to hide the twitter password on disk.  In the future I plan to add some UI features to request the user for a login/password.
+
+The Current implementation
 
 == REQUIREMENTS:
 
@@ -16,25 +20,32 @@ Please feel free to give a hand and produce some code, review it, fix bugs, etc.
 
 == INSTALL:
 
-* copy to a folder of yours and open using Shoes binary 
+* make a directory '.twittershoes' in your $HOME directory.
+* inside this directory, run this command and keep track of the password: openssl genrsa -des3 -out private.pem 2048
+* extract the public key: openssl rsa -in private.pem -out public.pem -outform PEM -pubout
+* make sure the public.pem and private.pem are in your .twittershoes directory
+* copy all *.rb files to a folder of yours
+* fill in username / password at the beginning of the twittershoes.rb
+* open twittershoes.rb using Shoes
+* after first run, can clear the username/password
+
+== CREDIT:
+
+Forked from Perdo Mg's twittershoes app: http://github.com/pedromg/twittershoes/tree
+Copyright (C) 2007 Perdo Mg <http://blog.tquadrado.com>
+Copyright (C) 2008 Terence Lee <hone02@gmail.com>
 
 == LICENSE:
 
-    Copyright (c) 2007 pedro mg
-        
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to
-    deal in the Software without restriction, including without limitation the
-    rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-    sell copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-                                     
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
-                                                    
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-    THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-    IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with TwitterShoes.  If not, see <http://www.gnu.org/licenses/>.
