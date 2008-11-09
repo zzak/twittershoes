@@ -58,6 +58,7 @@ PNGSTART
     debug( "State: #{@state.inspect}" )
     @page = 1
     @profile_images = Hash.new
+    @favorites = get_favorites
     refresh
   end
 
@@ -86,7 +87,6 @@ PNGSTART
     file_path = "#{@twitter_config.cache_dir}/#{key}.jpg"
 
     if @profile_images[key].nil?
-      debug( "File Path: #{file_path}" )
       response = Net::HTTP.get_response( URI.parse( path ) )
       if response.is_a? Net::HTTPOK
         File.open( file_path, 'w' ) do |file|
@@ -104,17 +104,28 @@ PNGSTART
   #  this method sets the message to be sent to each message stack
   #  notice the final eval(uation) that packs all the string together.
   def twit(id, i, n, sn, t, e)  
-    sn == @twitter_config.user ? del = link(" x", :underline => false, :stroke => "#732A2A") { @twitter_config.destroy_message("/status/destroy/#{id}.xml"); alert("Status id:#{id} has been DELETED") } : del = ""
     flow :margin => 5 do
       background "#161616", :radius => 8
       stack :width => 58 do
         image download_profile_image( i ), :margin => 5, :click => "http://twitter.com/#{sn}"
       end
       stack :width => -58, :margin => 5 do
-        l = link(n, :click => "http://twitter.com/#{sn}", :underline => false, :stroke => orange)
-        m = link(Mytime.elapsed_time(e), :font => 'smallfont', :size => 6, :stroke => '#6D6D6D', :underline => false, :click => "http://www.twitter.com/#{sn}/statuses/#{id}")
-        r = link('←', :underline => false, :stroke => '#183616') { @i_say.text = "@#{sn} " }
-        eval "para l, ': ', \"#{t}\", \" \", m, \" \", r, del, :font => 'Arial', :size => 8, :stroke => '#999999'"
+        name = link("#{n} (#{sn})", :click => "http://twitter.com/#{sn}", :underline => false, :stroke => orange)
+        elapsed_time = link( Mytime.elapsed_time(e), :font => 'smallfont', :size => 6, :stroke => '#6D6D6D', :underline => false, :click => "http://www.twitter.com/#{sn}/statuses/#{id}")
+        del_reply =
+          if sn == @twitter_config.user
+            link( " x", :underline => false, :stroke => "#732A2A" ) { delete( id ) }
+          else
+            link('←', :underline => false, :stroke => '#183616') { @i_say.text = "@#{sn} " }
+          end
+        favorite =
+          if @favorites.include?( id )
+            link( ' -', :underline => false, :stroke => yellow ) { remove_favorite( id ) }
+          else
+            link( ' +', :underline => false, :stroke => yellow ) { add_favorite( id ) }
+          end
+
+        eval "para name, ': ', \"#{t}\", \" \", elapsed_time, \" \", del_reply, favorite, :font => 'Arial', :size => 8, :stroke => '#999999'"
       end
     end
   end
@@ -202,10 +213,33 @@ PNGSTART
   # decrements page count and retrieves the previous page of the timeline
   def previous_page
     @page -= 1
-    @page = 1if @page < 1
+    @page = 1 if @page < 1
     refresh
   end
 
+  # deletes status message
+  def delete( id )
+    @twitter_config.twitter_client.status( :delete, id )
+    refresh
+  end
+
+  # adds message to favorites
+  def add_favorite( id )
+    @twitter_config.twitter_client.favorite( :add, id )
+    @favorites = get_favorites
+    refresh
+  end
+
+  # removes message from favorites
+  def remove_favorite( id )
+    @twitter_config.twitter_client.favorite( :remove, id )
+    @favorites = get_favorites
+    refresh
+  end
+
+  def get_favorites
+    @twitter_config.twitter_client.favorites.collect {|favorite| favorite.id }
+  end
   # refresh messages
   def refresh
     self.clear
