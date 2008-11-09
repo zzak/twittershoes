@@ -62,7 +62,7 @@ PNGSTART
   end
 
   def fetch_data
-    @data = @twitter_config.twitter_client.timeline_for( :friends, :id => @twitter_config.user )
+    @data = @twitter_config.twitter_client.timeline_for( :friends, :id => @twitter_config.user, :page => @page )
   end
 
   # TODO Setup page...
@@ -181,9 +181,9 @@ PNGSTART
       end
       stack :width => STATUS_RIGHT_PANE_WIDTH, height => STATUS_STACK_HEIGHT do
         para( link( " Update ", :size => 8, :font => "Arial", :fill => "#4992E6" , :stroke => "#D5E0ED", :underline => false ) { upandaway } )
-        para( link( "<· ", :size => 8, :font => "Arial", :stroke => "#3276BA", :underline => false) { alert("previous page (temporarily disabled by Twitter)") },
-             "  1  ", 
-             link(" ·>", :size => 8, :font => "Arial", :stroke => "#3276BA", :underline => false) { alert("next page (temporarily disabled by Twitter)") }, :top => 15, :size => 7, :font => "Arial", :stroke => "#3276BA", :underline => false)
+        para( link( "<· ", :size => 8, :font => "Arial", :stroke => "#3276BA", :underline => false) { previous_page },
+             "  #{@page}  ", 
+             link(" ·>", :size => 8, :font => "Arial", :stroke => "#3276BA", :underline => false) { next_page }, :top => 15, :size => 7, :font => "Arial", :stroke => "#3276BA", :underline => false)
         @remaining = para "140", " chars", :top => 30, :size => 6, :font => "Arial", :stroke => "#3276BA"
         para( link( " Refresh ", :size => 8, :font => "Arial", :fill => "#4992E6" , :stroke => "#D5E0ED", :underline => false ) { refresh } )
       end
@@ -191,6 +191,19 @@ PNGSTART
 
     # displays timeline for friends
     get_thread
+  end
+
+  # increments page count and retreives the next page of the timeline
+  def next_page
+    @page += 1
+    refresh
+  end
+
+  # decrements page count and retrieves the previous page of the timeline
+  def previous_page
+    @page -= 1
+    @page = 1if @page < 1
+    refresh
   end
 
   # refresh messages
