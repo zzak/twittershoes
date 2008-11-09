@@ -21,9 +21,7 @@ The Current implementation
 == INSTALL:
 
 * copy all *.rb files to a folder of yours
-* fill in twitter username / password and crypto password (from above) at the beginning of the twittershoes.rb
 * open tshoe.rb using Shoes
-* after first run, can clear the twitter username/password
 
 Note: If you're upgrading from a previous version.  You should clear out the ${HOME}/.twittershoes directory.
 
