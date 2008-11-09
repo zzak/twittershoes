@@ -24,14 +24,16 @@ require 'rexml/document'
 require 'base64'
 require 'yaml'
 require 'net/http'
+require 'tmpdir'
 
 # Manages
 class TwitterConfig
 
-  attr_reader :user, :twitter_client, :state
+  attr_reader :user, :twitter_client, :state, :cache_dir
 
   def initialize( user = nil, password = nil )
     @path = "#{user_home}/.twittershoes"
+    @cache_dir = "#{@path}/cache"
     @settings_file = "#{@path}/twittershoes.yaml"
     @private_key_file = "#{@path}/rsa_key"
     @public_key_file = "#{@path}/rsa_key.pub"
@@ -44,6 +46,8 @@ class TwitterConfig
     end
     @twitter_client = Twitter::Client.new( { :login => @user, :password => @password } )
     @password = nil # clear password from memory
+
+    make_cache_dir
   end
 
   # get credentials for an old user or store new user (to twittershoes) credentials
@@ -109,6 +113,16 @@ class TwitterConfig
     end
 
     state
+  end
+
+  # clears cache directory or creates it if it doesn't exist
+  def make_cache_dir
+    if File.directory?( @cache_dir )
+      files = Dir[ "#{@cache_dir}/*" ]
+      FileUtils.rm( files )
+    else
+      FileUtils.mkdir( @cache_dir )
+    end
   end
 
   # determine the user home directory based on OS

@@ -23,6 +23,9 @@ require 'setup'
 require 'twitter_config'
 require 'mytime'
 require 'state'
+require 'net/http'
+require 'digest/sha1'
+require 'base64'
 
 # GUI (Shoes) part of the application
 class Tshoe < Shoes
@@ -54,6 +57,7 @@ PNGSTART
     end
     debug( "State: #{@state.inspect}" )
     @page = 1
+    @profile_images = Hash.new
     refresh
   end
 
@@ -69,11 +73,31 @@ PNGSTART
   # creation of a default image
   # no cache here. Image is always (because rarely) created on-time.
   def default_twitter_image
-    name = File.join(CACHE_DIR, 'twitter_image.png')
+    name = File.join( @twitter_config.cache_dir, 'twitter_image.png' )
     File.open(name, 'wb') do |fout|
       fout.syswrite Default_png
     end
     name
+  end
+
+  # downloads profile image and caches them. If file already exists just returns the path.
+  def download_profile_image( path )
+    key = Base64.encode64( Digest::SHA1.digest( path ) ).gsub( '/', '' ) # can't have /'s or will misinterpret as directories
+    file_path = "#{@twitter_config.cache_dir}/#{key}.jpg"
+
+    if @profile_images[key].nil?
+      debug( "File Path: #{file_path}" )
+      response = Net::HTTP.get_response( URI.parse( path ) )
+      if response.is_a? Net::HTTPOK
+        File.open( file_path, 'w' ) do |file|
+          file.write( response.body )
+        end
+      end
+
+      @profile_images[key] = file_path
+    end
+
+    file_path
   end
 
   #  twit (id, image, name, screen_name, text, elapsedtime)
@@ -84,7 +108,7 @@ PNGSTART
     flow :margin => 5 do
       background "#161616", :radius => 8
       stack :width => 58 do
-     #   image i, :margin => 5, :click => "http://twitter.com/#{sn}"
+        image download_profile_image( i ), :margin => 5, :click => "http://twitter.com/#{sn}"
       end
       stack :width => -58, :margin => 5 do
         l = link(n, :click => "http://twitter.com/#{sn}", :underline => false, :stroke => orange)
@@ -119,7 +143,7 @@ PNGSTART
     c > 0 ? "#{c.to_s} chars" : "Too Long!"
   end
 
-  # send message and clear the text box
+  # send message and clear the text box and refreshes the page
   def upandaway
     @twitter_config.twitter_client.status( :post, @i_say.text )
     @i_say.text = ''
