@@ -22,7 +22,7 @@ The Current implementation
 
 * copy all *.rb files to a folder of yours
 * fill in twitter username / password and crypto password (from above) at the beginning of the twittershoes.rb
-* open twittershoes.rb using Shoes
+* open tshoe.rb using Shoes
 * after first run, can clear the twitter username/password
 
 == CREDIT:
