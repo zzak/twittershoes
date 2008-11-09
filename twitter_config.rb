@@ -37,6 +37,7 @@ class TwitterConfig
     @settings_file = "#{@path}/twittershoes.yaml"
     @private_key_file = "#{@path}/rsa_key"
     @public_key_file = "#{@path}/rsa_key.pub"
+    make_conf_directory
     @digital_signature = get_digital_signature
     @state = credentials( user, password )
 
@@ -82,6 +83,13 @@ class TwitterConfig
     state
   end
 
+  # make the configuration directory (@path)
+  def make_conf_directory
+    if not File.directory?( @path )
+      FileUtils.mkdir( @path )
+    end
+  end
+
   # Generates a RSA Digital Signature Key Pair (public and private) if the files don't exist.
   # Sets the private/public keys for the Digital Signature
   def get_digital_signature
@@ -101,9 +109,6 @@ class TwitterConfig
         :user => @user,
         :password => @digital_signature.encrypt( @password )
       }
-      if not File.directory?( @path )
-        FileUtils.mkdir( @path )
-      end
       File.open(@settings_file, 'w') do |f|
         YAML::dump(tree, f)
       end
