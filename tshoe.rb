@@ -29,12 +29,12 @@ require 'base64'
 
 # GUI (Shoes) part of the application
 class Tshoe < Shoes
-  TWITTER_PASSWORD = ''
-  TWITTER_USERNAME = ''
   LIMIT = 140
   STATUS_STACK_HEIGHT = 70
   STATUS_RIGHT_PANE_WIDTH = 50
   TEXT_BOX_WIDTH = 235
+  ACCOUNT_WINDOW_WIDTH = 250
+  ACCOUNT_WINDOW_HEIGHT = 175
   BACKGROUND = "#2F2F2F"
   DEFAULT_TEXT = "what are you doing?"
   Default_png = <<PNGSTART
@@ -47,19 +47,56 @@ PNGSTART
   # Index page
   def index
     @data = nil
+    @page = 1
+    @profile_images = Hash.new
     @twitter_config = TwitterConfig.new
     @state = @twitter_config.state # TODO should store password, should also check if credentials work
     # check if the credentials were loaded properly, if not try a new login password
     if @state.is_a? State and not @state.ok
       debug( "State: #{@state.inspect}" )
-      @twitter_config = TwitterConfig.new( TWITTER_USERNAME, TWITTER_PASSWORD )
+      username_password_query
       @state = @twitter_config.state
+    else
+      debug( "State: #{@state.inspect}" )
+      finish_setup
     end
-    debug( "State: #{@state.inspect}" )
-    @page = 1
-    @profile_images = Hash.new
+  end
+
+  # tasks to be run after user authenticated
+  # gets collection of user favorites and loads page.
+  def finish_setup
     @favorites = get_favorites
     refresh
+  end
+
+  # queries for username and password if no yaml file is found
+  def username_password_query
+    username = nil
+    password = nil
+    password_entry = nil
+    username_entry = nil
+
+    stack :margin_top => 10, :margin_left => 5, :margin_right => 5 do
+      subtitle( "Account Details" )
+      stack :margin_bottom => 5 do
+        border black, :strokewidth => 1
+        flow :displace_top => 7 do
+          para( "Username: " )
+          username_entry = edit_line
+        end
+        flow do
+          para( "Password: " )
+          password_entry = edit_line :secret => true
+        end
+      end
+      button "Okay" do
+        username = username_entry.text
+        password = password_entry.text
+        @twitter_config = TwitterConfig.new( username, password )
+        debug( "State: #{@state.inspect}" )
+        finish_setup
+      end
+    end
   end
 
   def fetch_data
@@ -83,10 +120,11 @@ PNGSTART
 
   # downloads profile image and caches them. If file already exists just returns the path.
   def download_profile_image( path )
-    key = Base64.encode64( Digest::SHA1.digest( path ) ).gsub( '/', '' ) # can't have /'s or will misinterpret as directories
+    key = Base64.encode64( Digest::SHA1.digest( path ) ).gsub( '/', '' ).gsub( '\n', '' ) # can't have /'s or will misinterpret as directories
     file_path = "#{@twitter_config.cache_dir}/#{key}.jpg"
 
     if @profile_images[key].nil?
+      # TODO use shoes download instead?
       response = Net::HTTP.get_response( URI.parse( path ) )
       if response.is_a? Net::HTTPOK
         File.open( file_path, 'w' ) do |file|

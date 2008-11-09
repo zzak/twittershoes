@@ -25,6 +25,12 @@ The Current implementation
 * open tshoe.rb using Shoes
 * after first run, can clear the twitter username/password
 
+Note: If you're upgrading from a previous version.  You should clear out the ${HOME}/.twittershoes directory.
+
+== BUGS:
+
+I have only been able to test this on my Ubuntu box.  If anyone comes across platform specific bugs, shoot me an e-mail @ hone02@gmail.com.  This is the case for any bugs actually.
+
 == CREDIT:
 
 Forked from Perdo Mg's twittershoes app: http://github.com/pedromg/twittershoes/tree
