@@ -20,10 +20,6 @@ The Current implementation
 
 == INSTALL:
 
-* make a directory '.twittershoes' in your $HOME directory.
-* inside this directory, run this command and keep track of the password: openssl genrsa -des3 -out private.pem 2048
-* extract the public key: openssl rsa -in private.pem -out public.pem -outform PEM -pubout
-* make sure the public.pem and private.pem are in your .twittershoes directory
 * copy all *.rb files to a folder of yours
 * fill in twitter username / password and crypto password (from above) at the beginning of the twittershoes.rb
 * open twittershoes.rb using Shoes
@@ -34,6 +30,9 @@ The Current implementation
 Forked from Perdo Mg's twittershoes app: http://github.com/pedromg/twittershoes/tree
 Copyright (C) 2007 Perdo Mg <http://blog.tquadrado.com>
 Copyright (C) 2008 Terence Lee <hone02@gmail.com>
+
+Uses twitter4r (http://twitter4r.rubyforge.org/) by Susan Potter for twitter backend.
+Uses metafusion-crypto (http://snakesgemscoffee.blogspot.com/2007/10/democratic-debate-ann-coulter-and.html) by Susan Potter for crypto library.
 
 == LICENSE:
 
