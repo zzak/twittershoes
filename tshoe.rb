@@ -93,6 +93,7 @@ PNGSTART
         username = username_entry.text
         password = password_entry.text
         @twitter_config = TwitterConfig.new( username, password )
+        password = nil
         debug( "State: #{@state.inspect}" )
         finish_setup
       end
@@ -163,24 +164,50 @@ PNGSTART
             link( ' +', :underline => false, :stroke => yellow ) { add_favorite( id ) }
           end
 
-        eval "para name, ': ', \"#{t}\", \" \", elapsed_time, \" \", del_reply, favorite, :font => 'Arial', :size => 8, :stroke => '#999999'"
+        debug "para name, ': ', #{t}, \" \", elapsed_time, \" \", del_reply, favorite, :font => 'Arial', :size => 8, :stroke => '#999999'"
+        eval "para name, ': ', #{t}, \" \", elapsed_time, \" \", del_reply, favorite, :font => 'Arial', :size => 8, :stroke => '#999999'"
       end
     end
   end
   
   # tweet message link parse and conversion to shoes links with eval(uation).
   # tries to discover http links in messages and prepare them for eval(uation).
-  def linkparse(s) 
-    s.gsub!(/\"/, "'")
-    if s.include? "http://"
-      r = ""
-      s.each(' ') { |e|
-        b = e.gsub!(/(()|(\S+))http:\/\/\S+/, "link('\\0', :click => '\\0', :font => 'Arial', :size => 8, :underline => false, :stroke => '#397EAA')")
-        b.nil? ? r << e : r << "\", #{b}, \""
-      }
-      r
+  def linkparse( tweet ) 
+    tweet.gsub!(/\"/, "'")
+    if tweet.include? "http://"
+      replacement_string = Array.new
+
+      # check each token for http link, and build the new tweet
+      tweet.each(' ') do |token|
+        # check for the case where url is b/t parenthesis: (http://www.tinyurl.com)
+        match_data = /\((http:\/\/\S+)\)/.match( token )
+
+        # if it hasn't matched, check for a regular url
+        if match_data.nil?
+          match_data = /(http:\/\/\S+)/.match( token )
+        end
+        
+        # if we found a url, replace it with a link
+        if match_data
+          extra_tokens = token.split( match_data[1] )
+          replaced_string = "link('#{match_data[1]}', :click => '#{match_data[1]}', :font => 'Arial', :size => 8, :underline => false, :stroke => '#397EAA' )"
+          # check for prepending/postpending characters
+          if extra_tokens.empty?
+            replacement_string.push( replaced_string )
+          else
+            replacement_string.push( " \"#{extra_tokens[0]}\"" ) unless extra_tokens[0].empty?
+            replacement_string.push( replaced_string )
+            replacement_string.push( "\"#{extra_tokens[1]}\"" ) unless extra_tokens[1].empty?
+          end
+        # if no url in token
+        else
+          replacement_string.push( "\"#{token}\"" )
+        end
+      end
+
+      replacement_string.join( ", " )
     else
-      s
+      "\"#{tweet}\""
     end
   end
 
