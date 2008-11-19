@@ -195,9 +195,9 @@ PNGSTART
           if extra_tokens.empty?
             replacement_string.push( replaced_string )
           else
-            replacement_string.push( " \"#{extra_tokens[0]}\"" ) unless extra_tokens[0].empty?
+            replacement_string.push( " \"#{extra_tokens[0]}\"" ) if extra_tokens[0] and not extra_tokens[0].empty?
             replacement_string.push( replaced_string )
-            replacement_string.push( "\"#{extra_tokens[1]}\"" ) unless extra_tokens[1].empty?
+            replacement_string.push( "\"#{extra_tokens[1]}\"" ) if extra_tokens[1] and not extra_tokens[1].empty?
           end
         # if no url in token
         else
