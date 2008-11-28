@@ -29,6 +29,7 @@ require 'base64'
 
 # GUI (Shoes) part of the application
 class Tshoe < Shoes
+  DELETE_SLEEP_DURATION = 0.5
   LIMIT = 140
   STATUS_STACK_HEIGHT = 70
   STATUS_RIGHT_PANE_WIDTH = 50
@@ -285,6 +286,7 @@ PNGSTART
   # deletes status message
   def delete( id )
     @twitter_config.twitter_client.status( :delete, id )
+    sleep( DELETE_SLEEP_DURATION ) # hack, because for some reason, if you try to refresh immediately, refreshes page too soon.
     refresh
   end
 
