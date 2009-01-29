@@ -27,5 +27,5 @@ Shoes.setup do
 end
 
 require 'json'
-require 'twitter'
 require 'metafusion/crypto'
+require_local 'lib/twitter'

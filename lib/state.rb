@@ -20,6 +20,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
+require File.expand_path( File.join( File.dirname(__FILE__), '..', 'twittershoes' ) )
+
 # Represents the current state of the application
-class State < Struct.new( :ok, :message )
+module TwitterShoes
+  class State < Struct.new( :ok, :message )
+  end
 end

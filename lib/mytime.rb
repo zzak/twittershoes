@@ -20,15 +20,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-require 'time'
+# require 'time'
+require File.expand_path( File.join( File.dirname(__FILE__), '..', 'twittershoes' ) )
 
-# Time representation for Twitter
-class Mytime < Time
+module TwitterShoes
+  # Time representation for Twitter
+  class Mytime < Time
 
-  # time representation twitter_like, using: ago's
-  def self.elapsed_time(e) 
-    et = now - e
-    case et
+    # time representation twitter_like, using: ago's
+    def self.elapsed_time(e) 
+      et = now - e
+      case et
       when 1..60
         "#{et.to_i} secs ago"
       when 60..120
@@ -43,6 +45,7 @@ class Mytime < Time
         "#{(et/60/60).to_i} day ago"
       else
         "#{(et/60/60/60).to_i} days ago"
+      end
     end
   end
 end
