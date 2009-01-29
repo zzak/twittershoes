@@ -40,6 +40,13 @@ module TwitterShoes
     ACCOUNT_WINDOW_HEIGHT = 175
     BACKGROUND = "#2F2F2F"
     DEFAULT_TEXT = "what are you doing?"
+    # hash containing all escape characters and their mapped characters
+    # keyed by escape sequence
+    # value is coresponding character
+    ESCAPE_CHAR = {
+        '&lt;' => '<',
+        '&gt;' => '>'
+    }
     Default_png = <<PNGSTART
 \211PNG\r\n\032\n\000\000\000\rIHDR\000\000\0000\000\000\0000\004\003\000\000\000\245,\344\264\000\000\000\001sRGB\000\256\316\034\351\000\000\0000PLTE\207cC\207eJ\211iS\212qb\214vn\214~}\220\207\215\217\220\235\224\233\260\227\244\301\233\257\324\237\267\342\241\277\360\242\304\373\236\311\377\245\313\3731j\275\350\000\000\000\001bKGD\000\210\005\035H\000\000\000\tpHYs\000\000\v\023\000\000\v\023\001\000\232\234\030\000\000\000\atIME\a\330\003\034\003\0172\"\337U\003\000\000\001TIDAT8\313c\020\304\001\030F%\bK000`\225`\016\357H\026\300&\221\375\356\335\333\311\214\230\022\032\357V\244\317\371\035\210!!\320w]\200\201u\377f\210\004\243\022\\\232\345\334\004\240l\314\017F\220\004s\347\256\251\214P\t\211?\016@\222\363\215!PB \372\317\236wMP\t\255\237 \222\365n\002PB\370\334d\345\234\347\020-\002\266?A\f\341{\r@\t\311_\n\002\354@\275`\340\367\002,q~\002P\302\372;\243 \363\271\004\210D\034X\253\320~\240\204\200\317SFA\241\365\r\020\t\333\037p\035\002~_A\022\023 \0226`;D\336\001\355\020\360\275\212\244C\353\227\"\220d{\vt\225\200\3157F\240\313\n \022\354o\003\200\244\324kE\220\253\200Ng{\023\000\r\333}\213\030\005\005j\237\203|\316z\267H\320\373\a\324\353\002\271\257\234\030\325\317O\002\205\225@\355\253\316s\213\301\022\300x\020;\177\262s\337KCp \262\256\271\263]QP\331\330\330\330\304PP\300\363\354\333\323I\320\210\022v\026\020\024\210{\367\356\335\373\211@]\246\251\216\360\250\005\231c\321\001\004\211 \363\030\030Q\342\\\200\001\232\nF\363\a\035$\000|\224\234q\3363+s\000\000\000\000IEND\256B`\202
 PNGSTART
@@ -178,21 +185,34 @@ PNGSTART
       eval_string
     end
 
+    # parse html escape sequences
+    def html_escape_parse( tweet )
+      ESCAPE_CHAR.each do |sequence, character|
+        tweet.gsub!( sequence, character )
+      end
+
+      tweet
+    end
+
     # tweet message link parse and conversion to shoes links with eval(uation).
     # tries to discover http links in messages and prepare them for eval(uation).
-    def linkparse( tweet ) 
+    def link_parse( tweet ) 
       tweet.gsub!(/\"/, "'")
       if tweet.include? "http://"
         replacement_string = Array.new
 
         # check each token for http link, and build the new tweet
         tweet.each(' ') do |token|
+          url_regex = /(http:\/\/\S+)/
           # check for the case where url is b/t parenthesis: (http://www.tinyurl.com)
-          match_data = /\((http:\/\/\S+)\)/.match( token )
+          match_data = /[(]#{url_regex}[)]/.match( token )
+          if match_data.nil?
+            match_data = /[']#{url_regex}[']/.match( token )
+          end
 
           # if it hasn't matched, check for a regular url
           if match_data.nil?
-            match_data = /(http:\/\/\S+)/.match( token )
+            match_data = url_regex.match( token )
           end
 
           # if we found a url, replace it with a link
@@ -203,7 +223,7 @@ PNGSTART
             if extra_tokens.empty?
               replacement_string.push( replaced_string )
             else
-              replacement_string.push( " \"#{extra_tokens[0]}\"" ) if extra_tokens[0] and not extra_tokens[0].empty?
+              replacement_string.push( "\"#{extra_tokens[0]}\"" ) if extra_tokens[0] and not extra_tokens[0].empty?
               replacement_string.push( replaced_string )
               replacement_string.push( "\"#{extra_tokens[1]}\"" ) if extra_tokens[1] and not extra_tokens[1].empty?
             end
@@ -239,7 +259,7 @@ PNGSTART
     def get_thread
       if @data != nil
         @data.each do |message|
-          twit( message.id, message.user.profile_image_url, message.user.name, message.user.screen_name, linkparse( message.text ), message.created_at )
+          twit( message.id, message.user.profile_image_url, message.user.name, message.user.screen_name, link_parse( html_escape_parse( message.text ) ), message.created_at )
         end
       else
         m1 = 'fetching twitter data... please wait or press '

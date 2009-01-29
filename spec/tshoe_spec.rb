@@ -1,3 +1,25 @@
+=begin
+    TwitterShoes
+    twittershoes.rb
+    ruby script created to be a Twitter (http://www.twitter.com) client,
+    that uses Shoes.rb to be run on various platforms (Linux, MacOSX, Windows).
+    Copyright (C) 2007, 2008 Pedro Mg <http://blog.tquadrado.com>
+    Copyright (C) 2008 Terence Lee <hone02@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+=end
+
 require 'spec/mocks'
 require File.expand_path( File.join( File.dirname(__FILE__), 'spec_helper' ) )
 
@@ -23,6 +45,12 @@ require_local 'lib/tshoe'
 
 module TshoeSpecHelper
   def setup_tshoe
+    # need to mock Twitter4r library
+    @twitter_client = mock( "Twitter Client" )
+    @twitter_client.stub!(:favorites).and_return( [] )
+    @twitter_client.stub!(:timeline_for)
+    Twitter::Client.stub!(:new).and_return( @twitter_client )
+
     @tshoe = TwitterShoes::Tshoe.new
     # stub the rest of the Shoes methods
     @tshoe.stub!(:clear)
@@ -38,7 +66,7 @@ module TshoeSpecHelper
   end
 end
 
-describe "Tshoe linkparse" do
+describe TwitterShoes::Tshoe,"link_parse" do
   include TshoeSpecHelper
 
   before(:each) do
@@ -48,10 +76,55 @@ describe "Tshoe linkparse" do
   it "should parse normal text" do
     text = "normal twit text."
 
-    @tshoe.linkparse( text ).should == "\"#{text}\""
+    @tshoe.link_parse( text ).should == "\"#{text}\""
   end
 
   it "should parse an isolated hyperlink" do
-    @tshoe.linkparse( "Go here: http://www.google.com" ).should == "\"Go \", \"here: \", #{generate_link('http://www.google.com')}"
+    @tshoe.link_parse( "Go here: http://www.google.com sweet" ).should == "\"Go \", \"here: \", #{generate_link('http://www.google.com')}, \" \", \"sweet\""
   end
+
+  it "should parse a link with surrounding parentheses" do
+    @tshoe.link_parse( "Go here (http://www.google.com) sweet" ).should == "\"Go \", \"here \", \"(\", #{generate_link('http://www.google.com')}, \") \", \"sweet\""
+  end
+
+  it "should parse a link with a left parenethesis" do
+    @tshoe.link_parse( "Go here (http://www.google.com sweet" ).should == "\"Go \", \"here \", \"(\", #{generate_link('http://www.google.com')}, \" \", \"sweet\""
+  end
+
+  # not sure if program should parse the ) or not
+  it "should parse a link with a right parenthesis" do
+    @tshoe.link_parse( "Go here http://www.google.com) sweet" ).should == "\"Go \", \"here \", #{generate_link('http://www.google.com)')}, \" \", \"sweet\""
+  end
+
+  it "should parse a url with single quotes" do
+    @tshoe.link_parse( "Go here 'http://www.google.com' sweet" ).should == "\"Go \", \"here \", \"'\", #{generate_link('http://www.google.com')}, \"' \", \"sweet\""
+  end
+
+  it "should parse double quotes"
+end
+
+describe TwitterShoes::Tshoe, "html_escape_parse" do
+  include TshoeSpecHelper
+
+  before(:each) do
+    setup_tshoe
+  end
+
+  it "should parse <" do
+    @tshoe.html_escape_parse( "5 &lt; 10" ).should == "5 < 10"
+  end
+
+  it "should parse >" do
+    @tshoe.html_escape_parse( "10 &gt; 5" ).should == "10 > 5"
+  end
+end
+
+describe TwitterShoes::Tshoe, "name_parse" do
+  it "should parse name at beginning of message"
+
+  it "should parse name in the middle of a message"
+
+  it "should parse multiple names"
+
+  it "should parse names separated by commas"
 end
