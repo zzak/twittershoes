@@ -143,7 +143,9 @@ describe TwitterShoes::Tshoe, "name_parse" do
     @tshoe.name_parse( "\"hey @xxx what's up?\"" ).should == "\"hey @\", #{generate_username_link( "xxx" )}, \" what's up?\""
   end
 
-  it "should parse name at the end of a message"
+  it "should parse name at the end of a message" do
+    @tshoe.name_parse( "\"hey @xxx\"" ).should == "\"hey @\", #{generate_username_link( "xxx" )}"
+  end
 
   it "should parse multiple names"
 

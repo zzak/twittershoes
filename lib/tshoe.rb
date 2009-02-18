@@ -191,8 +191,9 @@ PNGSTART
       if match_data
         components = tweet.split( "@#{match_data[1]}" )
         tweet = components.join( "@\", #{generate_link( match_data[1], "http://www.twitter.com/#{match_data[1]}" )}, \"" )
-        if components.first.empty?
-          tweet = tweet[3, tweet.length - 3]
+        # remove unnecessary empty quote at end if name is at the end of a message
+        if components.last == "\""
+          tweet = tweet[0, tweet.length - 4]
         end
       end
 
