@@ -1,6 +1,6 @@
 =begin
     TwitterShoes
-    twittershoes.rb
+    tshoe.rb
     ruby script created to be a Twitter (http://www.twitter.com) client,
     that uses Shoes.rb to be run on various platforms (Linux, MacOSX, Windows).
     Copyright (C) 2007, 2008 Pedro Mg <http://blog.tquadrado.com>
@@ -185,6 +185,20 @@ PNGSTART
       eval_string
     end
 
+    # parses the name into a link to that person
+    def name_parse( tweet )
+      match_data = /@(\w+)/.match( tweet )
+      if match_data
+        components = tweet.split( "@#{match_data[1]}" )
+        tweet = components.join( "@\", #{generate_link( match_data[1], "http://www.twitter.com/#{match_data[1]}" )}, \"" )
+        if components.first.empty?
+          tweet = tweet[3, tweet.length - 3]
+        end
+      end
+
+      tweet
+    end
+
     # parse html escape sequences
     def html_escape_parse( tweet )
       ESCAPE_CHAR.each do |sequence, character|
@@ -192,6 +206,15 @@ PNGSTART
       end
 
       tweet
+    end
+
+    # generates string of a link to be eventually eval'd
+    def generate_link( text, url = nil )
+      if url.nil?
+        url = text
+      end
+
+      "link('#{text}', :click => '#{url}', :font => 'Arial', :size => 8, :underline => false, :stroke => '#397EAA' )"
     end
 
     # tweet message link parse and conversion to shoes links with eval(uation).
@@ -218,7 +241,7 @@ PNGSTART
           # if we found a url, replace it with a link
           if match_data
             extra_tokens = token.split( match_data[1] )
-            replaced_string = "link('#{match_data[1]}', :click => '#{match_data[1]}', :font => 'Arial', :size => 8, :underline => false, :stroke => '#397EAA' )"
+            replaced_string = generate_link( match_data[1] )
             # check for prepending/postpending characters
             if extra_tokens.empty?
               replacement_string.push( replaced_string )
@@ -259,7 +282,7 @@ PNGSTART
     def get_thread
       if @data != nil
         @data.each do |message|
-          twit( message.id, message.user.profile_image_url, message.user.name, message.user.screen_name, link_parse( html_escape_parse( message.text ) ), message.created_at )
+          twit( message.id, message.user.profile_image_url, message.user.name, message.user.screen_name, name_parse( link_parse( html_escape_parse( message.text ) ) ), message.created_at )
         end
       else
         m1 = 'fetching twitter data... please wait or press '

@@ -1,6 +1,6 @@
 =begin
     TwitterShoes
-    twittershoes.rb
+    tshoe_spec.rb
     ruby script created to be a Twitter (http://www.twitter.com) client,
     that uses Shoes.rb to be run on various platforms (Linux, MacOSX, Windows).
     Copyright (C) 2007, 2008 Pedro Mg <http://blog.tquadrado.com>
@@ -64,9 +64,16 @@ module TshoeSpecHelper
   def generate_link( address )
     "link('#{address}', :click => '#{address}', :font => 'Arial', :size => 8, :underline => false, :stroke => '#397EAA' )"
   end
+
+  def generate_username_link( username )
+    @tshoe.generate_link( username, "http://www.twitter.com/#{username}" )
+  end
 end
 
-describe TwitterShoes::Tshoe,"link_parse" do
+describe TwitterShoes::Tshoe, "generate_link" do
+end
+
+describe TwitterShoes::Tshoe, "link_parse" do
   include TshoeSpecHelper
 
   before(:each) do
@@ -80,27 +87,29 @@ describe TwitterShoes::Tshoe,"link_parse" do
   end
 
   it "should parse an isolated hyperlink" do
-    @tshoe.link_parse( "Go here: http://www.google.com sweet" ).should == "\"Go \", \"here: \", #{generate_link('http://www.google.com')}, \" \", \"sweet\""
+    @tshoe.link_parse( "Go here: http://www.google.com sweet" ).should == "\"Go \", \"here: \", #{@tshoe.generate_link('http://www.google.com')}, \" \", \"sweet\""
   end
 
   it "should parse a link with surrounding parentheses" do
-    @tshoe.link_parse( "Go here (http://www.google.com) sweet" ).should == "\"Go \", \"here \", \"(\", #{generate_link('http://www.google.com')}, \") \", \"sweet\""
+    @tshoe.link_parse( "Go here (http://www.google.com) sweet" ).should == "\"Go \", \"here \", \"(\", #{@tshoe.generate_link('http://www.google.com')}, \") \", \"sweet\""
   end
 
   it "should parse a link with a left parenethesis" do
-    @tshoe.link_parse( "Go here (http://www.google.com sweet" ).should == "\"Go \", \"here \", \"(\", #{generate_link('http://www.google.com')}, \" \", \"sweet\""
+    @tshoe.link_parse( "Go here (http://www.google.com sweet" ).should == "\"Go \", \"here \", \"(\", #{@tshoe.generate_link('http://www.google.com')}, \" \", \"sweet\""
   end
 
   # not sure if program should parse the ) or not
   it "should parse a link with a right parenthesis" do
-    @tshoe.link_parse( "Go here http://www.google.com) sweet" ).should == "\"Go \", \"here \", #{generate_link('http://www.google.com)')}, \" \", \"sweet\""
+    @tshoe.link_parse( "Go here http://www.google.com) sweet" ).should == "\"Go \", \"here \", #{@tshoe.generate_link('http://www.google.com)')}, \" \", \"sweet\""
   end
 
   it "should parse a url with single quotes" do
-    @tshoe.link_parse( "Go here 'http://www.google.com' sweet" ).should == "\"Go \", \"here \", \"'\", #{generate_link('http://www.google.com')}, \"' \", \"sweet\""
+    @tshoe.link_parse( "Go here 'http://www.google.com' sweet" ).should == "\"Go \", \"here \", \"'\", #{@tshoe.generate_link('http://www.google.com')}, \"' \", \"sweet\""
   end
 
   it "should parse double quotes"
+
+  it "should parse multiple urls"
 end
 
 describe TwitterShoes::Tshoe, "html_escape_parse" do
@@ -120,11 +129,25 @@ describe TwitterShoes::Tshoe, "html_escape_parse" do
 end
 
 describe TwitterShoes::Tshoe, "name_parse" do
-  it "should parse name at beginning of message"
+  include TshoeSpecHelper
 
-  it "should parse name in the middle of a message"
+  before(:each) do
+    setup_tshoe
+  end
+
+  it "should parse name at beginning of message" do
+    @tshoe.name_parse( "\"@xxx what's up man?\"" ).should == "\"@\", #{generate_username_link( "xxx" )}, \" what's up man?\""
+  end
+
+  it "should parse name in the middle of a message" do
+    @tshoe.name_parse( "\"hey @xxx what's up?\"" ).should == "\"hey @\", #{generate_username_link( "xxx" )}, \" what's up?\""
+  end
+
+  it "should parse name at the end of a message"
 
   it "should parse multiple names"
 
   it "should parse names separated by commas"
+
+  it "should only parse name if preceded with @ symbol"
 end
