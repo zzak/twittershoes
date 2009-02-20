@@ -187,6 +187,8 @@ PNGSTART
 
     # parses the name into a link to that person
     def name_parse( tweet )
+      original_tweet = tweet
+
       match_data = /@(\w+)/.match( tweet )
       if match_data
         components = tweet.split( "@#{match_data[1]}" )
@@ -198,6 +200,12 @@ PNGSTART
       end
 
       tweet
+      # keep parsing for names until there are no names left.
+#       if original_tweet == tweet
+#         tweet
+#       else
+#         name_parse( tweet )
+#       end
     end
 
     # parse html escape sequences

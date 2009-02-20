@@ -147,7 +147,9 @@ describe TwitterShoes::Tshoe, "name_parse" do
     @tshoe.name_parse( "\"hey @xxx\"" ).should == "\"hey @\", #{generate_username_link( "xxx" )}"
   end
 
-  it "should parse multiple names"
+  it "should parse multiple names" do
+    @tshoe.name_parse( "\"hey @xxx and @yyy and @zzz\"" ).should == "\"hey @\", #{generate_username_link( "xxx" )}, \" and @\", #{generate_username_link( "yyy" )}, \" and @\", #{generate_username_link( "zzz" )}"
+  end
 
   it "should parse names separated by commas"
 
