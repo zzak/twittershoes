@@ -199,13 +199,13 @@ PNGSTART
         end
       end
 
-      tweet
+#       tweet
       # keep parsing for names until there are no names left.
-#       if original_tweet == tweet
-#         tweet
-#       else
-#         name_parse( tweet )
-#       end
+      if original_tweet == tweet
+        tweet
+      else
+        name_parse( tweet )
+      end
     end
 
     # parse html escape sequences
