@@ -189,7 +189,7 @@ PNGSTART
     def name_parse( tweet )
       original_tweet = tweet
 
-      match_data = /@(\w+)/.match( tweet )
+      match_data = /\B@(\w+)/.match( tweet )
       if match_data
         components = tweet.split( "@#{match_data[1]}" )
         tweet = components.join( "@\", #{generate_link( match_data[1], "http://www.twitter.com/#{match_data[1]}" )}, \"" )

@@ -154,4 +154,8 @@ describe TwitterShoes::Tshoe, "name_parse" do
   it "should parse names separated by commas"
 
   it "should only parse name if preceded with @ symbol"
+
+  it "should not parse e-mail addresses" do
+   @tshoe.name_parse( "\"email me: me@example.com\"" ).should == "\"email me: me@example.com\""
+  end
 end
