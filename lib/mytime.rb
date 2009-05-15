@@ -20,9 +20,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-# require 'time'
-require File.expand_path( File.join( File.dirname(__FILE__), '..', 'twittershoes' ) )
-
 module TwitterShoes
   # Time representation for Twitter
   class Mytime < Time

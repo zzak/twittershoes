@@ -25,4 +25,4 @@ end
 require_local 'lib/state'
 require_local 'lib/mytime'
 require_local 'lib/twitter_config'
-
+require_local 'lib/tshoe'

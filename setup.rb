@@ -24,14 +24,16 @@
 Shoes.setup do
   gem 'json_pure'
   gem 'metafusion-crypto'
+  gem 'twitter4r'
 end
 
 require 'json'
 require 'metafusion/crypto'
+require 'twitter'
 
 # Need to define for lib twitter
-def require_local( suffix )
-  require File.expand_path( File.join( File.dirname( __FILE__ ), suffix ) )
-end
+# def require_local( suffix )
+#   require File.expand_path( File.join( File.dirname( __FILE__ ), suffix ) )
+# end
 
-require_local 'lib/twitter'
+# require_local 'lib/twitter'

@@ -19,14 +19,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
-# require 'setup'
-# require 'twitter_config'
-# require 'mytime'
-# require 'state'
-# require 'net/http'
-# require 'digest/sha1'
-# require 'base64'
-require File.expand_path( File.join( File.dirname(__FILE__), '..', 'twittershoes' ) )
 
 module TwitterShoes
   # GUI (Shoes) part of the application
