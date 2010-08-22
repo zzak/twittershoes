@@ -21,13 +21,13 @@
 =end
 
 # performs any setup required.  Downloads prequisite gems needed to run the app.
-#Shoes.setup do
+Shoes.setup do
 #  gem 'json_pure'
-#  gem 'metafusion-crypto'
+  gem 'metafusion-crypto'
 #  gem 'twitter4r'
-#end
+end
 
-#require 'metafusion/crypto'
+require 'metafusion/crypto'
 
 # Need to define for lib twitter
 # def require_local( suffix )
