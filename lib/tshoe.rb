@@ -159,7 +159,7 @@ PNGSTART
             if sn == @twitter_config.user
               link( " x", :underline => false, :stroke => "#732A2A" ) { delete( id ) }
             else
-              link('←', :underline => false, :stroke => '#183616') { @i_say.text = "@#{sn} " }
+              link('<-', :underline => false, :stroke => '#183616') { @i_say.text = "@#{sn} " }
             end
           favorite =
             if @favorites.include?( id )
@@ -309,9 +309,9 @@ PNGSTART
         end
         stack :width => STATUS_RIGHT_PANE_WIDTH, height => STATUS_STACK_HEIGHT do
           para( link( " Update ", :size => 8, :font => "Arial", :fill => "#4992E6" , :stroke => "#D5E0ED", :underline => false ) { upandaway } )
-          para( link( "<· ", :size => 8, :font => "Arial", :stroke => "#3276BA", :underline => false) { previous_page },
+          para( link( "<- ", :size => 8, :font => "Arial", :stroke => "#3276BA", :underline => false) { previous_page },
              "  #{@page}  ", 
-             link(" ·>", :size => 8, :font => "Arial", :stroke => "#3276BA", :underline => false) { next_page }, :top => 15, :size => 7, :font => "Arial", :stroke => "#3276BA", :underline => false)
+             link(" ->", :size => 8, :font => "Arial", :stroke => "#3276BA", :underline => false) { next_page }, :top => 15, :size => 7, :font => "Arial", :stroke => "#3276BA", :underline => false)
           @remaining = para "140", " chars", :top => 30, :size => 6, :font => "Arial", :stroke => "#3276BA"
           para( link( " Refresh ", :size => 8, :font => "Arial", :fill => "#4992E6" , :stroke => "#D5E0ED", :underline => false ) { refresh } )
         end
