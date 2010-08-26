@@ -124,7 +124,7 @@ PNGSTART
     # downloads profile image and caches them. If file already exists just returns the path.
     def download_profile_image( path )
       key = Base64.encode64( Digest::SHA1.digest( path ) ).gsub( '/', '' ).gsub( '\n', '' ) # can't have /'s or will misinterpret as directories
-      file_path = "#{@twitter_config.cache_dir}/#{key}.jpg"
+      file_path = "#{@twitter_config.cache_dir}/#{key.chomp}.jpg"
 
       if @profile_images[key].nil?
         # TODO use shoes download instead?
@@ -167,8 +167,7 @@ PNGSTART
             else
               link( ' +', :underline => false, :stroke => yellow ) { add_favorite( id ) }
             end
-
-          eval_string = "para name, ': ', #{t}, \" \", elapsed_time, \" \", del_reply, favorite, :font => 'Arial', :size => 8, :stroke => '#999999'"
+					eval_string = "para name, ': ', t, \" \", elapsed_time, \" \", del_reply, favorite, :font => 'Arial', :size => 8, :stroke => '#999999'"
           debug eval_string
           eval( eval_string )
         end
@@ -226,7 +225,7 @@ PNGSTART
         replacement_string = Array.new
 
         # check each token for http link, and build the new tweet
-        tweet.each(' ') do |token|
+        tweet.split(' ') do |token|
           url_regex = /(http:\/\/\S+)/
           # check for the case where url is b/t parenthesis: (http://www.tinyurl.com)
           match_data = /[(]#{url_regex}[)]/.match( token )
